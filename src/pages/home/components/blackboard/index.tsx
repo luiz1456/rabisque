@@ -149,8 +149,8 @@ export const Blackboard = forwardRef<HTMLCanvasElement, BlackboardProps>(
         }
       }
 
-      setinitialCoordinate(currentCoordinate)
-      if (activeTool !== 'lineWithDots') {
+      if (activeTool !== 'lineWithDots' && activeTool !== 'fill') {
+        setinitialCoordinate(currentCoordinate)
         setDrawing(true)
         drawingLayerContext?.beginPath()
         draw(currentCoordinate)
@@ -209,9 +209,9 @@ export const Blackboard = forwardRef<HTMLCanvasElement, BlackboardProps>(
         if (colorsMatch(targetColor, fillColor)) {
           return
         }
-        if (currentCoordinate.x < 0 || currentCoordinate.y < 0) {
-          return
-        }
+        // if (currentCoordinate.x < 0 || currentCoordinate.y < 0) {
+        //   return
+        // }
         const currentColor = getPixelColor({ currentCoordinate, imageData })
         if (currentColor && colorsMatch(currentColor, targetColor)) {
           setPixelColor({
@@ -219,27 +219,34 @@ export const Blackboard = forwardRef<HTMLCanvasElement, BlackboardProps>(
             fillColor,
             imageData,
           })
-
-          fillStack.push({
-            point: newPoint(currentCoordinate.x + 1, currentCoordinate.y),
-            targetColor,
-            fillColor,
-          })
-          fillStack.push({
-            point: newPoint(currentCoordinate.x - 1, currentCoordinate.y),
-            targetColor,
-            fillColor,
-          })
-          fillStack.push({
-            point: newPoint(currentCoordinate.x, currentCoordinate.y + 1),
-            targetColor,
-            fillColor,
-          })
-          fillStack.push({
-            point: newPoint(currentCoordinate.x, currentCoordinate.y - 1),
-            targetColor,
-            fillColor,
-          })
+          if (currentCoordinate.x < imageData.width) {
+            fillStack.push({
+              point: newPoint(currentCoordinate.x + 1, currentCoordinate.y),
+              targetColor,
+              fillColor,
+            })
+          }
+          if (currentCoordinate.x > 0) {
+            fillStack.push({
+              point: newPoint(currentCoordinate.x - 1, currentCoordinate.y),
+              targetColor,
+              fillColor,
+            })
+          }
+          if (currentCoordinate.y < imageData.height) {
+            fillStack.push({
+              point: newPoint(currentCoordinate.x, currentCoordinate.y + 1),
+              targetColor,
+              fillColor,
+            })
+          }
+          if (currentCoordinate.y > 0) {
+            fillStack.push({
+              point: newPoint(currentCoordinate.x, currentCoordinate.y - 1),
+              targetColor,
+              fillColor,
+            })
+          }
         }
       }
 
@@ -257,7 +264,6 @@ export const Blackboard = forwardRef<HTMLCanvasElement, BlackboardProps>(
             }
           })
           fillStack.splice(0, range)
-
           fillColorRun()
         } else {
           if (drawingLayerContext) {
@@ -301,96 +307,6 @@ export const Blackboard = forwardRef<HTMLCanvasElement, BlackboardProps>(
         y,
       }
     }
-
-    // function floodFill(
-    //   targetColor: ColorTypeRgba,
-    //   currentCoordinate: CoordinateType | null,
-    //   imageData: ImageData,
-    //   fillColor: ColorTypeRgba | null,
-    // ) {
-    //   if (currentCoordinate) {
-    //     if (
-    //       currentCoordinate.x < 0 ||
-    //       currentCoordinate.y < 0 ||
-    //       currentCoordinate.x >= imageData.width ||
-    //       currentCoordinate.y >= imageData.height
-    //     ) {
-    //       return
-    //     }
-    //   }
-    //   // const currentColor = getPixelColor({
-    //   //   currentCoordinate,
-    //   //   imageData,
-    //   // })
-    //   let newImageData
-    //   if (currentCoordinate) {
-    //     const offset =
-    //       (currentCoordinate.y * imageData.width + currentCoordinate.x) * 4
-    //     const currentColor = [
-    //       imageData.data[offset + 0],
-    //       imageData.data[offset + 1],
-    //       imageData.data[offset + 2],
-    //       imageData.data[offset + 3],
-    //     ]
-
-    //     if (colorsMatch(targetColor, fillColor)) {
-    //       return
-    //     }
-    //     if (currentColor && colorsMatch(targetColor, currentColor)) {
-    //       console.log('executou')
-    //       newImageData = setPixelColor({
-    //         currentCoordinate,
-    //         imageData,
-    //         fillColor,
-    //       })
-    //       fillStack.push({
-    //         point: { x: currentCoordinate!.x + 1, y: currentCoordinate!.y },
-    //         targetColor,
-    //         fillColor,
-    //       })
-    //       fillStack.push({
-    //         point: { x: currentCoordinate!.x - 1, y: currentCoordinate!.y },
-    //         targetColor,
-    //         fillColor,
-    //       })
-    //       fillStack.push({
-    //         point: { x: currentCoordinate!.x, y: currentCoordinate!.y + 1 },
-    //         targetColor,
-    //         fillColor,
-    //       })
-    //       fillStack.push({
-    //         point: { x: currentCoordinate!.x, y: currentCoordinate!.y - 1 },
-    //         targetColor,
-    //         fillColor,
-    //       })
-
-    //       console.log(fillStack)
-    //     }
-    //   }
-    //   return newImageData
-    // }
-    // function fill() {
-    //   let newImageData: ImageData
-    //   if (fillStack.length) {
-    //     fillStack.forEach((fillPoint) => {
-    //       floodFill(
-    //         fillPoint.fillColor!,
-    //         fillPoint.point,
-    //         imageData,
-    //         fillPoint.fillColor,
-    //       )
-    //     })
-    //     console.log(fillStack.length)
-    //     fillStack.slice(0, fillStack.length)
-    //     console.log(fillStack)
-    //     fill()
-    //   } else {
-    //     fillStack = []
-    //   }
-    //   if (drawingLayerContext && newImageData) {
-    //     drawingLayerContext.putImageData(newImageData, 0, 0)
-    //   }
-    // }
 
     function lineWithDots() {
       clearPreviewContext()
@@ -529,7 +445,6 @@ export const Blackboard = forwardRef<HTMLCanvasElement, BlackboardProps>(
 
     function handleMouseUp(event: TypeEventMouseOrTouch) {
       setinitialCoordinate(null)
-      console.log('aqui')
       if (
         initialCoordinate &&
         activeTool !== 'lineWithDots' &&
