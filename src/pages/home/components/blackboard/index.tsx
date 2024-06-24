@@ -196,11 +196,16 @@ export const Blackboard = forwardRef<HTMLCanvasElement, BlackboardProps>(
       const fillColor = hexToRgba(color)
 
       let fillStack: FillPointType[] = []
-
-      floodFill(currentCoordinate, targetColor, fillColor)
+      if (targetColor && fillColor) {
+        floodFill(currentCoordinate, targetColor, fillColor)
+      }
       fillColorRun()
 
-      function floodFill(currentCoordinate, targetColor, fillColor) {
+      function floodFill(
+        currentCoordinate: CoordinateType,
+        targetColor: ColorTypeRgba,
+        fillColor: ColorTypeRgba,
+      ) {
         if (colorsMatch(targetColor, fillColor)) {
           return
         }
@@ -242,17 +247,22 @@ export const Blackboard = forwardRef<HTMLCanvasElement, BlackboardProps>(
         if (fillStack.length) {
           const range = fillStack.length
           fillStack.forEach((fillPoint) => {
-            floodFill(
+            const [currentCoordinate, targetColor, fillColor] = [
               fillPoint.point,
               fillPoint.targetColor,
               fillPoint.fillColor,
-            )
+            ]
+            if (targetColor && fillColor) {
+              floodFill(currentCoordinate, targetColor, fillColor)
+            }
           })
           fillStack.splice(0, range)
 
           fillColorRun()
         } else {
-          drawingLayerContext.putImageData(imageData, 0, 0)
+          if (drawingLayerContext) {
+            drawingLayerContext.putImageData(imageData, 0, 0)
+          }
           fillStack = []
         }
       }
