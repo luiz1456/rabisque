@@ -530,7 +530,11 @@ export const Blackboard = forwardRef<HTMLCanvasElement, BlackboardProps>(
     function handleMouseUp(event: TypeEventMouseOrTouch) {
       setinitialCoordinate(null)
       console.log('aqui')
-      if (initialCoordinate && activeTool !== 'lineWithDots') {
+      if (
+        initialCoordinate &&
+        activeTool !== 'lineWithDots' &&
+        activeTool !== 'fill'
+      ) {
         const currentCoordinate = getCoordinate({
           blackboardRef,
           event,
