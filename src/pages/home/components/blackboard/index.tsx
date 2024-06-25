@@ -209,9 +209,9 @@ export const Blackboard = forwardRef<HTMLCanvasElement, BlackboardProps>(
         if (colorsMatch(targetColor, fillColor)) {
           return
         }
-        // if (currentCoordinate.x < 0 || currentCoordinate.y < 0) {
-        //   return
-        // }
+        if (currentCoordinate.x < 0 || currentCoordinate.y < 0) {
+          return
+        }
         const currentColor = getPixelColor({ currentCoordinate, imageData })
         if (currentColor && colorsMatch(currentColor, targetColor)) {
           setPixelColor({
@@ -219,34 +219,26 @@ export const Blackboard = forwardRef<HTMLCanvasElement, BlackboardProps>(
             fillColor,
             imageData,
           })
-          if (currentCoordinate.x < imageData.width) {
-            fillStack.push({
-              point: newPoint(currentCoordinate.x + 1, currentCoordinate.y),
-              targetColor,
-              fillColor,
-            })
-          }
-          if (currentCoordinate.x > 0) {
-            fillStack.push({
-              point: newPoint(currentCoordinate.x - 1, currentCoordinate.y),
-              targetColor,
-              fillColor,
-            })
-          }
-          if (currentCoordinate.y < imageData.height) {
-            fillStack.push({
-              point: newPoint(currentCoordinate.x, currentCoordinate.y + 1),
-              targetColor,
-              fillColor,
-            })
-          }
-          if (currentCoordinate.y > 0) {
-            fillStack.push({
-              point: newPoint(currentCoordinate.x, currentCoordinate.y - 1),
-              targetColor,
-              fillColor,
-            })
-          }
+          fillStack.push({
+            point: newPoint(currentCoordinate.x + 1, currentCoordinate.y),
+            targetColor,
+            fillColor,
+          })
+          fillStack.push({
+            point: newPoint(currentCoordinate.x - 1, currentCoordinate.y),
+            targetColor,
+            fillColor,
+          })
+          fillStack.push({
+            point: newPoint(currentCoordinate.x, currentCoordinate.y + 1),
+            targetColor,
+            fillColor,
+          })
+          fillStack.push({
+            point: newPoint(currentCoordinate.x, currentCoordinate.y - 1),
+            targetColor,
+            fillColor,
+          })
         }
       }
 
@@ -445,11 +437,7 @@ export const Blackboard = forwardRef<HTMLCanvasElement, BlackboardProps>(
 
     function handleMouseUp(event: TypeEventMouseOrTouch) {
       setinitialCoordinate(null)
-      if (
-        initialCoordinate &&
-        activeTool !== 'lineWithDots' &&
-        activeTool !== 'fill'
-      ) {
+      if (initialCoordinate && activeTool !== 'lineWithDots') {
         const currentCoordinate = getCoordinate({
           blackboardRef,
           event,

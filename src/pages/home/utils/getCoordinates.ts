@@ -12,11 +12,11 @@ export function getCoordinate({ blackboardRef, event }: GetCoordinateProps) {
       x:
         'changedTouches' in event
           ? Math.round(event.changedTouches[0].clientX - positionElement.left)
-          : event.clientX - positionElement.left,
+          : Math.round(event.clientX - positionElement.left),
       y:
         'changedTouches' in event
           ? Math.round(event.changedTouches[0].clientY - positionElement.top)
-          : event.clientY - positionElement.top,
+          : Math.round(event.clientY - positionElement.top),
     }
     return coordinate
   } else {
