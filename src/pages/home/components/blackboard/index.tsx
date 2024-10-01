@@ -93,6 +93,7 @@ export function Blackboard({
             (coordinate.x - currentCoordinate.x) ** 2 +
               (coordinate.y - currentCoordinate.y) ** 2,
           )
+          console.log(distanceOfPoints)
 
           if (distanceOfPoints <= 10) {
             setSelectedCoordinateIndex(i)
